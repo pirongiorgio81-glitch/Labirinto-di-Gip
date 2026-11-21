@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0010">
+  <title>Record — Il Labirinto di Gip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Source+Sans+3:wght@400;600;700;800&display=swap');
+    :root{
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --pink: #ff4f93;
+      --gold: #ffd166;
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body{
+      width:100%; height:100dvh; margin:0; overflow:hidden;
+      background:#19000e; color:#fff5fa;
+      font-family:"Source Sans 3", Arial, sans-serif;
+      touch-action:manipulation;
+    }
+    body{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      background: radial-gradient(circle at 50% 32%, #a62869 0%, #510c31 42%, #19000e 100%);
+      padding: 12px;
+    }
+    .glow{
+      position:fixed; width:75vw; max-width:480px; aspect-ratio:1; border-radius:50%;
+      background:rgba(255, 149, 196, 0.18); filter:blur(28px);
+      animation:pulse 2.6s ease-in-out infinite; pointer-events:none;
+    }
+    .record-card{
+      position:relative; z-index:2; width:min(92vw, 520px);
+      max-height:calc(100dvh - 24px);
+      padding: calc(24px + var(--safe-top)) 24px calc(24px + var(--safe-bottom));
+      overflow-y:auto;
+      border:1px solid rgba(255, 213, 231, 0.6);
+      border-radius:26px;
+      background:linear-gradient(145deg, rgba(132, 26, 78, 0.92), rgba(43, 1, 25, 0.94));
+      text-align:center;
+      box-shadow: 0 18px 65px rgba(0,0,0,0.55), 0 0 45px rgba(255, 71, 145, 0.45), inset 0 1px rgba(255,255,255,0.22);
+      animation:enter 0.8s cubic-bezier(.2,.85,.3,1) both;
+      margin: auto;
+    }
+    h1{
+      margin:0; color:#fff7fb; font-family:"Cinzel", serif;
+      font-size:clamp(32px, 10vw, 56px); font-weight:800;
+      letter-spacing:clamp(1px, 1vw, 6px); line-height:1;
+      text-shadow: 0 0 8px #fff, 0 0 25px #ff4c98, 0 0 55px #a31454;
+    }
+    .line{
+      width:min(245px, 70%); height:2px; margin:20px auto 16px;
+      background:linear-gradient(90deg, transparent, #ffd2e4, #fff, #ffd2e4, transparent);
+      box-shadow:0 0 16px #ff5a9d;
+    }
+    .message{
+      margin:0 auto 8px; color:#ffe5f0; font-family:"Dancing Script", cursive;
+      font-size:clamp(24px, 7vw, 38px); font-weight:700; line-height:1.12;
+      text-shadow:0 0 14px rgba(255, 121, 181, 0.8);
+    }
+    .stats-preview{
+      display:flex; justify-content:center; gap:24px; margin:16px 0;
+      color:#fff; font-size:18px; font-weight:700;
+    }
+    .stats-preview span{ color:var(--gold); }
+    #name-input{
+      width:100%; max-width:280px; padding:14px 16px; margin:8px auto 16px;
+      border:2px solid rgba(255, 213, 231, 0.5); border-radius:14px;
+      background:rgba(0,0,0,0.3); color:#fff;
+      font-family:"Cinzel", serif; font-size:20px; font-weight:700;
+      text-align:center; letter-spacing:2px; text-transform:uppercase;
+      outline:none;
+    }
+    #name-input:focus{ border-color:var(--pink); box-shadow:0 0 15px rgba(255,79,147,0.5); }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-height:48px; gap:9px; padding:10px 20px;
+      border:1px solid rgba(255, 219, 234, 0.58); border-radius:14px;
+      background:linear-gradient(180deg, #d94080, #8a1549);
+      color:#fffafd; font-family:"Cinzel", serif; font-size:14px; font-weight:800;
+      letter-spacing:0.4px; text-decoration:none;
+      box-shadow: 0 4px 0 #4c082a, inset 0 1px rgba(255,255,255,0.25);
+      transition:transform .12s ease, filter .12s ease; cursor:pointer;
+      width:100%; max-width:280px; margin:6px auto;
+    }
+    .btn.secondary{ background:linear-gradient(180deg, #9d3666, #59142f); }
+    .btn:active{ transform:translateY(3px) scale(.98); filter:brightness(1.2); }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+    #record-table-container{ margin-top:20px; }
+    h2{
+      color:#fff; font-family:"Cinzel", serif; font-size:22px;
+      margin:0 0 12px; letter-spacing:1px;
+    }
+    table{
+      width:100%; border-collapse:collapse; margin:0 auto;
+      font-size:15px; font-weight:600;
+    }
+    th, td{
+      padding:8px 6px; text-align:center;
+      border-bottom:1px solid rgba(255, 213, 231, 0.2);
+    }
+    th{
+      color:var(--gold); font-family:"Cinzel", serif;
+      font-size:13px; font-weight:800; letter-spacing:0.5px;
+      text-transform:uppercase;
+    }
+    td{ color:#fff; }
+    td:first-child{ font-weight:800; color:var(--gold); }
+    #no-records{
+      color:rgba(255, 220, 235, 0.7); font-size:16px;
+      font-weight:600; margin:20px 0;
+    }
+    .buttons{ display:flex; flex-direction:column; gap:10px; width:100%; margin-top:20px; }
+    @keyframes enter{ from{ opacity:0; transform:translateY(28px) scale(.91); } to{ opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes pulse{ 0%,100%{ transform:scale(.86); opacity:.42; } 50%{ transform:scale(1.12); opacity:.9; } }
+    @media (prefers-reduced-motion: reduce){
+      *, *::before, *::after{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+  <main class="record-card">
+    <h1>RECORD</h1>
+    <div class="line"></div>
+
+    <div id="record-form-container" style="display:none;">
+      <p class="message">Inserisci il tuo nome!</p>
+      <div class="stats-preview">
+        <div>Monete: <span id="preview-coins">0</span></div>
+        <div>Livello: <span id="preview-level">1</span></div>
+      </div>
+      <input type="text" id="name-input" maxlength="8" placeholder="Nome (max 8)" autocomplete="off" autocapitalize="characters">
+      <button id="save-record-btn" class="btn">Salva Record</button>
+    </div>
+
+    <div id="record-table-container">
+      <h2>Top 10</h2>
+      <table id="record-table">
+        <thead>
+          <tr><th>#</th><th>Nome</th><th>Monete</th><th>Livello</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <p id="no-records" style="display:none;">Nessun record ancora. Gioca per crearne uno!</p>
+    </div>
+
+    <div class="buttons">
+      <a href="index.html" class="btn secondary"><i class="fas fa-home"></i> Torna al menu</a>
+    </div>
+  </main>
+
+  <script>
+    const RECORDS_KEY = 'labirinto_records';
+    const LAST_RESULT_KEY = 'labirinto_last_result';
+
+    function loadRecords() {
+      try {
+        const raw = localStorage.getItem(RECORDS_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch { return []; }
+    }
+
+    function saveRecords(records) {
+      try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch {}
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m];
+      });
+    }
+
+    function renderTable(records) {
+      const tbody = document.querySelector('#record-table tbody');
+      const noRecords = document.getElementById('no-records');
+      tbody.innerHTML = '';
+      if (records.length === 0) {
+        noRecords.style.display = 'block';
+        return;
+      }
+      noRecords.style.display = 'none';
+      records.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(r.name)}</td><td>${r.coins}</td><td>${r.level}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // On load
+    const lastResultRaw = localStorage.getItem(LAST_RESULT_KEY);
+    let lastResult = null;
+    if (lastResultRaw) {
+      try { lastResult = JSON.parse(lastResultRaw); } catch {}
+    }
+    if (lastResult && lastResult.coins != null && lastResult.level != null) {
+      document.getElementById('record-form-container').style.display = 'block';
+      document.getElementById('preview-coins').textContent = lastResult.coins;
+      document.getElementById('preview-level').textContent = lastResult.level;
+    } else {
+      document.getElementById('record-form-container').style.display = 'none';
+    }
+
+    let records = loadRecords();
+    records.sort((a,b) => b.coins - a.coins || b.level - a.level || a.date - b.date);
+    records = records.slice(0, 10);
+    renderTable(records);
+
+    document.getElementById('save-record-btn').addEventListener('click', () => {
+      const nameInput = document.getElementById('name-input');
+      let name = nameInput.value.trim().toUpperCase();
+      if (!name) { alert('Inserisci un nome!'); return; }
+      name = name.slice(0, 8);
+      if (lastResult) {
+        const newRecord = {
+          name: name,
+          coins: lastResult.coins,
+          level: lastResult.level,
+          date: Date.now()
+        };
+        records.push(newRecord);
+        records.sort((a,b) => b.coins - a.coins || b.level - a.level || a.date - b.date);
+        records = records.slice(0, 10);
+        saveRecords(records);
+        renderTable(records);
+        localStorage.removeItem(LAST_RESULT_KEY);
+        document.getElementById('record-form-container').style.display = 'none';
+        alert('Record salvato!');
+      }
+    });
+  </script>
+</body>
+</html>

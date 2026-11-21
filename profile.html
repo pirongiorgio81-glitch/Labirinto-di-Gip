@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0010">
+  <title>Profilo — Il Labirinto di Gip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Source+Sans+3:wght@400;600;700;800&display=swap');
+    :root{ --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); --gold:#ffd54a; --green:#55dc8b; }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body{ width:100%; height:100dvh; margin:0; overflow:hidden; background:#19000e; color:#fff5fa; font-family:"Source Sans 3", Arial, sans-serif; }
+    body{ display:flex; align-items:center; justify-content:center; background: radial-gradient(circle at 50% 30%, #822359 0%, #3c0827 42%, #19000e 100%); }
+    .card{
+      position:relative; z-index:2; width:min(94vw, 620px);
+      max-height:calc(100dvh - 24px);
+      padding: calc(22px + var(--safe-top)) 22px calc(22px + var(--safe-bottom));
+      overflow-y:auto;
+      border:1px solid rgba(255,213,231,.6); border-radius:26px;
+      background:linear-gradient(145deg, rgba(132,26,78,.92), rgba(43,1,25,.94));
+      box-shadow:0 18px 65px rgba(0,0,0,.55), 0 0 45px rgba(255,71,145,.45), inset 0 1px rgba(255,255,255,.22);
+      text-align:center;
+    }
+    h1{ margin:0; font-family:"Cinzel", serif; font-size:clamp(28px, 8vw, 44px); font-weight:800; letter-spacing:2px;
+      text-shadow: 0 0 8px #fff, 0 0 25px #ff4c98, 0 0 55px #a31454; }
+    .line{ width:min(220px,70%); height:2px; margin:14px auto 18px;
+      background:linear-gradient(90deg, transparent, #ffd2e4, #fff, #ffd2e4, transparent); box-shadow:0 0 16px #ff5a9d; }
+    h2{ color:#fff; font-family:"Cinzel", serif; font-size:20px; letter-spacing:1px; margin:22px 0 12px; }
+    .stats-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:16px; }
+    .stat-box{ padding:12px 10px; border:1px solid rgba(255,213,231,.25); border-radius:12px; background:rgba(0,0,0,.28); }
+    .stat-box .val{ display:block; color:var(--gold); font-family:"Cinzel", serif; font-size:22px; font-weight:800; }
+    .stat-box .lbl{ display:block; color:rgba(255,225,235,.82); font-size:12px; font-weight:700; margin-top:4px; letter-spacing:.5px; }
+    .ach-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; }
+    .ach-card{
+      display:flex; gap:10px; align-items:center; padding:10px; border-radius:12px;
+      border:1px solid rgba(255,213,231,.2); background:rgba(0,0,0,.28);
+      text-align:left; opacity:.5;
+    }
+    .ach-card.unlocked{ opacity:1; border-color:rgba(255,213,74,.55); box-shadow:0 0 14px rgba(255,213,74,.28); }
+    .ach-card .ico{ font-size:26px; flex-shrink:0; }
+    .ach-card .nm{ color:#fff; font-family:"Cinzel", serif; font-size:12px; font-weight:800; letter-spacing:.3px; }
+    .ach-card .ds{ color:rgba(255,220,235,.75); font-size:11px; font-weight:600; margin-top:2px; }
+    .progress-bar{ width:100%; height:8px; border-radius:4px; background:rgba(0,0,0,.35); overflow:hidden; margin:8px 0 4px; }
+    .progress-bar > div{ height:100%; background:linear-gradient(90deg, #ffd54a, #55dc8b); transition:width .4s ease; }
+    .progress-text{ color:rgba(255,220,235,.82); font-size:13px; font-weight:700; margin-bottom:8px; }
+    .btn{
+      display:flex; align-items:center; justify-content:center; gap:9px; min-height:48px;
+      padding:10px 20px; margin-top:16px; border:1px solid rgba(255,219,234,.58); border-radius:14px;
+      background:linear-gradient(180deg, #9d3666, #59142f); color:#fff; text-decoration:none;
+      font-family:"Cinzel", serif; font-size:13px; font-weight:800; letter-spacing:.4px;
+      box-shadow:0 4px 0 #4c082a, inset 0 1px rgba(255,255,255,.25);
+    }
+    .btn:active{ transform:translateY(2px) scale(.98); filter:brightness(1.15); }
+    @media (prefers-reduced-motion: reduce){
+      *, *::before, *::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>PROFILO</h1>
+    <div class="line"></div>
+
+    <h2>Statistiche</h2>
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-box"><span class="val" id="st-kills">0</span><span class="lbl">Fantasmi uccisi</span></div>
+      <div class="stat-box"><span class="val" id="st-wins">0</span><span class="lbl">Vittorie</span></div>
+      <div class="stat-box"><span class="val" id="st-deaths">0</span><span class="lbl">Sconfitte</span></div>
+      <div class="stat-box"><span class="val" id="st-coins">0</span><span class="lbl">Monete raccolte</span></div>
+      <div class="stat-box"><span class="val" id="st-moves">0</span><span class="lbl">Mosse totali</span></div>
+      <div class="stat-box"><span class="val" id="st-time">0m</span><span class="lbl">Tempo di gioco</span></div>
+    </div>
+
+    <h2>Achievement</h2>
+    <div class="progress-bar"><div id="ach-progress-bar" style="width:0%"></div></div>
+    <div class="progress-text" id="ach-progress-text">0 / 0 sbloccati</div>
+    <div class="ach-grid" id="ach-grid"></div>
+
+    <a href="index.html" class="btn"><i class="fas fa-home"></i> Torna al Menu</a>
+  </main>
+
+  <script type="module">
+    import { ACHIEVEMENTS, loadUnlocked } from './achievements.js';
+
+    try {
+      const p = JSON.parse(localStorage.getItem('labirinto_profile') || '{}');
+      document.getElementById('st-kills').textContent = p.totalKills || 0;
+      document.getElementById('st-wins').textContent = p.totalWins || 0;
+      document.getElementById('st-deaths').textContent = p.totalDeaths || 0;
+      document.getElementById('st-coins').textContent = p.totalCoins || 0;
+      document.getElementById('st-moves').textContent = p.totalMoves || 0;
+      const mins = Math.floor((p.totalTime || 0) / 60);
+      document.getElementById('st-time').textContent = mins + 'm';
+    } catch(_) {}
+
+    const unlocked = loadUnlocked();
+    const grid = document.getElementById('ach-grid');
+    ACHIEVEMENTS.forEach(a => {
+      const isU = unlocked.has(a.id);
+      const card = document.createElement('div');
+      card.className = 'ach-card' + (isU ? ' unlocked' : '');
+      card.innerHTML = `
+        <div class="ico">${isU ? a.icon : '🔒'}</div>
+        <div>
+          <div class="nm">${a.name}</div>
+          <div class="ds">${a.desc}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+    const pct = Math.round((unlocked.size / ACHIEVEMENTS.length) * 100);
+    document.getElementById('ach-progress-bar').style.width = pct + '%';
+    document.getElementById('ach-progress-text').textContent = `${unlocked.size} / ${ACHIEVEMENTS.length} sbloccati (${pct}%)`;
+  </script>
+</body>
+</html>

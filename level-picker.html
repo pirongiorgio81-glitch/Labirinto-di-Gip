@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0010">
+  <title>Sbocca Livelli — Il Labirinto di Gip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Dancing+Script:wght@600;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --bg: #18000e;
+      --pink: #ff4f93;
+      --pink-light: #ffd2e3;
+      --gold: #ffd166;
+      --green: #55dc8b;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      width: 100vw; height: 100vh; height: 100dvh;
+      margin: 0; overflow: hidden;
+      background: var(--bg); color: #fff7fb;
+      font-family: "Source Sans 3", Arial, sans-serif;
+      touch-action: manipulation;
+    }
+
+    body {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 25%, #822359 0%, #3c0827 42%, #18000e 100%);
+    }
+
+    .glow {
+      position: fixed;
+      width: min(94vw, 560px); aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,89,155,.2);
+      filter: blur(38px);
+      pointer-events: none;
+      animation: glowPulse 3.4s ease-in-out infinite;
+    }
+
+    .picker {
+      position: relative; z-index: 2;
+      width: min(94vw, 620px);
+      max-height: calc(100dvh - 20px);
+      padding: calc(20px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
+      overflow-y: auto;
+      border: 1px solid rgba(255,203,225,.55);
+      border-radius: 26px;
+      background: linear-gradient(145deg, rgba(118,23,70,.95), rgba(38,1,23,.97));
+      text-align: center;
+      box-shadow: 0 20px 70px rgba(0,0,0,.62), 0 0 48px rgba(255,66,143,.35), inset 0 1px rgba(255,255,255,.18);
+      animation: menuIn .8s cubic-bezier(.2,.85,.3,1) both;
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff7fb;
+      font-family: "Cinzel", serif;
+      font-size: clamp(26px, 8vw, 44px);
+      font-weight: 800;
+      letter-spacing: clamp(1px, .8vw, 4px);
+      line-height: .98;
+      text-shadow: 0 0 9px #fff, 0 0 26px #ff54a0, 0 0 57px #a61455;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: #ffdce9;
+      font-family: "Dancing Script", cursive;
+      font-size: clamp(20px, 6vw, 30px);
+      font-weight: 700;
+      text-shadow: 0 0 13px rgba(255,112,173,.82);
+    }
+
+    .divider {
+      width: min(220px, 68%); height: 2px;
+      margin: 14px auto 16px;
+      background: linear-gradient(90deg, transparent, #ffd4e4, #fff, #ffd4e4, transparent);
+      box-shadow: 0 0 15px #ff5b9f;
+    }
+
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .level-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 12px 8px;
+      border: 1px solid rgba(255,212,231,.32);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(155,42,96,.85), rgba(63,8,35,.92));
+      color: #fff7fb;
+      text-decoration: none;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform .12s ease, filter .12s ease, border-color .18s, box-shadow .18s;
+      box-shadow: 0 3px 0 rgba(45,3,22,.8), inset 0 1px rgba(255,255,255,.12);
+    }
+
+    .level-btn:hover, .level-btn:active {
+      transform: translateY(2px) scale(.98);
+      filter: brightness(1.15);
+      border-color: rgba(255,213,74,.6);
+      box-shadow: 0 3px 0 rgba(45,3,22,.8), 0 0 14px rgba(255,213,74,.35), inset 0 1px rgba(255,255,255,.15);
+    }
+
+    .lv-num {
+      font-family: "Cinzel", serif;
+      font-size: clamp(20px, 5.5vw, 26px);
+      font-weight: 800;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(255,213,74,.5);
+      line-height: 1;
+    }
+
+    .lv-name {
+      font-family: "Source Sans 3", sans-serif;
+      font-size: clamp(11px, 2.8vw, 12px);
+      font-weight: 700;
+      color: rgba(255,230,240,.92);
+      text-align: center;
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .buttons { display: flex; flex-direction: column; gap: 9px; margin-top: 8px; }
+
+    .menu-button {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; min-height: 49px; gap: 10px;
+      padding: 10px 15px;
+      border: 1px solid rgba(255,212,231,.62);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #dd4686, #8b1649);
+      color: #fffaff;
+      font-family: "Cinzel", serif;
+      font-size: clamp(11px, 3.2vw, 13px);
+      font-weight: 800;
+      letter-spacing: .45px;
+      text-decoration: none;
+      box-shadow: 0 4px 0 #4b0829, inset 0 1px rgba(255,255,255,.27);
+      transition: transform .12s ease, filter .12s ease;
+      cursor: pointer;
+    }
+
+    .menu-button.secondary {
+      background: linear-gradient(180deg, #9d3666, #59142f);
+    }
+
+    .menu-button:active {
+      transform: translateY(3px) scale(.98);
+      filter: brightness(1.18);
+    }
+
+    @keyframes menuIn {
+      from { opacity: 0; transform: translateY(28px) scale(.92); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes glowPulse {
+      0%,100% { transform: scale(.85); opacity: .45; }
+      50% { transform: scale(1.12); opacity: .9; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+  <main class="picker">
+    <h1>SBLOCCA LIVELLI</h1>
+    <p class="subtitle">Modalità Libera</p>
+    <div class="divider"></div>
+    <div class="levels-grid" id="levels-grid"></div>
+    <div class="buttons">
+      <a href="index.html" class="menu-button secondary">
+        <i class="fas fa-arrow-left"></i> Torna al Menu Opzioni
+      </a>
+    </div>
+  </main>
+  <script type="module" src="level-picker.js"></script>
+</body>
+</html>

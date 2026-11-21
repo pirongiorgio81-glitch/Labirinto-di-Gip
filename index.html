@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0010">
+  <title>Il Labirinto di Gip</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Dancing+Script:wght@600;700&family=Source+Sans+3:wght@400;600;700;800&display=swap');
+    :root{
+      --bg:#18000e; --pink:#ff4f93; --gold:#ffd166; --green:#55dc8b;
+      --safe-top:env(safe-area-inset-top, 0px); --safe-bottom:env(safe-area-inset-bottom, 0px);
+    }
+    *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body{
+      width:100vw; height:100dvh; margin:0; overflow:hidden;
+      background:var(--bg); color:#fff7fb; font-family:"Source Sans 3", Arial, sans-serif;
+      touch-action:manipulation;
+    }
+    body{
+      display:flex; align-items:center; justify-content:center;
+      background:radial-gradient(circle at 50% 25%, #822359 0%, #3c0827 42%, #18000e 100%);
+    }
+    .glow{
+      position:fixed; width:min(94vw, 560px); aspect-ratio:1; border-radius:50%;
+      background:rgba(255,89,155,.2); filter:blur(38px); pointer-events:none;
+      animation:glowPulse 3.4s ease-in-out infinite;
+    }
+    .menu{
+      position:relative; z-index:2; width:min(94vw, 500px);
+      max-height:calc(100dvh - 24px); padding:calc(24px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));
+      overflow-y:auto; border:1px solid rgba(255,203,225,.55); border-radius:26px;
+      background:linear-gradient(145deg, rgba(118,23,70,.95), rgba(38,1,23,.97));
+      text-align:center; box-shadow:0 20px 70px rgba(0,0,0,.62), 0 0 48px rgba(255,66,143,.35);
+      animation:menuIn .8s cubic-bezier(.2,.85,.3,1) both;
+    }
+    h1{
+      margin:0; color:#fff7fb; font-family:"Cinzel", serif; font-size:clamp(32px, 9vw, 52px);
+      font-weight:800; letter-spacing:clamp(1px, 1vw, 4px); line-height:1;
+      text-shadow:0 0 9px #fff, 0 0 26px #ff54a0, 0 0 57px #a61455;
+    }
+    .subtitle{
+      margin:8px 0 0; color:#ffdce9; font-family:"Dancing Script", cursive;
+      font-size:clamp(24px, 7vw, 36px); font-weight:700; text-shadow:0 0 13px rgba(255,112,173,.82);
+    }
+    .divider{
+      width:min(220px, 68%); height:2px; margin:16px auto;
+      background:linear-gradient(90deg, transparent, #ffd4e4, #fff, #ffd4e4, transparent);
+      box-shadow:0 0 15px #ff5b9f;
+    }
+    .buttons{ display:flex; flex-direction:column; gap:12px; margin-top:10px; }
+    .btn{
+      display:flex; align-items:center; justify-content:center; width:100%; min-height:52px; gap:12px;
+      padding:12px 15px; border:1px solid rgba(255,212,231,.62); border-radius:14px;
+      background:linear-gradient(180deg, #dd4686, #8b1649); color:#fffaff;
+      font-family:"Cinzel", serif; font-size:clamp(13px, 3.5vw, 15px); font-weight:800;
+      letter-spacing:.5px; text-decoration:none; box-shadow:0 4px 0 #4b0829, inset 0 1px rgba(255,255,255,.27);
+      transition:transform .12s ease, filter .12s ease; cursor:pointer;
+    }
+    .btn.secondary{ background:linear-gradient(180deg, #9d3666, #59142f); }
+    .btn.gold{ background:linear-gradient(180deg, #e5aa34, #a2610b); box-shadow:0 4px 0 #5a3305; color:#1a1200;}
+    .btn:active{ transform:translateY(3px) scale(.98); filter:brightness(1.18); }
+    .btn[hidden]{ display:none !important; }
+
+    .diff-selector{
+      display:flex; gap:6px; margin-bottom:12px; padding:5px; border-radius:14px;
+      background:rgba(0,0,0,.28); border:1px solid rgba(255,201,225,.2);
+    }
+    .diff-btn{
+      flex:1; padding:10px 6px; border:none; border-radius:10px; background:transparent;
+      color:rgba(255,220,235,.72); font-family:"Cinzel", serif; font-size:clamp(11px, 3vw, 13px);
+      font-weight:800; cursor:pointer; transition:background .18s, color .18s;
+    }
+    .diff-btn.active{ background:linear-gradient(180deg, #dd4686, #8b1649); color:#fff; box-shadow:0 3px 0 #4b0829; }
+
+    @keyframes menuIn{ from{ opacity:0; transform:translateY(28px) scale(.92); } to{ opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes glowPulse{ 0%,100%{ transform:scale(.85); opacity:.45; } 50%{ transform:scale(1.12); opacity:.9; } }
+    @media (prefers-reduced-motion: reduce){ *, *::before, *::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="glow"></div>
+  <main class="menu">
+    <h1>IL LABIRINTO</h1>
+    <p class="subtitle">di Gip</p>
+    <div class="divider"></div>
+
+    <div class="diff-selector" id="diff-selector">
+      <button class="diff-btn" data-diff="facile">Facile</button>
+      <button class="diff-btn" data-diff="normale">Normale</button>
+      <button class="diff-btn" data-diff="difficile">Difficile</button>
+    </div>
+
+    <div class="buttons">
+      <a href="#" id="btn-continue" class="btn gold" hidden>
+        <i class="fas fa-play"></i> Continua
+      </a>
+      <button id="btn-new" class="btn">
+        <i class="fas fa-gamepad"></i> Nuova Partita
+      </button>
+      <a href="shop.html" class="btn secondary">
+        <i class="fas fa-store"></i> Shop
+      </a>
+      <a href="record.html" class="btn secondary">
+        <i class="fas fa-trophy"></i> Record
+      </a>
+      <a href="profile.html" class="btn secondary">
+        <i class="fas fa-user-circle"></i> Profilo
+      </a>
+      <!-- ✅ SBLOCCA LIVELLI -->
+      <button id="btn-unlock-levels" class="btn gold" type="button">
+        <i class="fas fa-key"></i> Sbocca Livelli
+      </button>
+    </div>
+  </main>
+
+  <script>
+    // Gestione Difficoltà
+    const DIFFICULTY_KEY = 'labirinto_difficulty';
+    const MAX_LEVELS = { facile: 5, normale: 10, difficile: 15 };
+
+    let currentDiff = localStorage.getItem(DIFFICULTY_KEY) || 'facile';
+
+    function updateDiffUI() {
+      document.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.diff === currentDiff);
+      });
+    }
+
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentDiff = btn.dataset.diff;
+        localStorage.setItem(DIFFICULTY_KEY, currentDiff);
+        updateDiffUI();
+      });
+    });
+    updateDiffUI();
+
+    // Gestione Nuova Partita
+    document.getElementById('btn-new').addEventListener('click', () => {
+      localStorage.removeItem('labirinto_state');
+      localStorage.removeItem('labirinto_cumulative');
+      localStorage.removeItem('labirinto_last_result');
+      localStorage.removeItem('labirinto_hp');
+      localStorage.removeItem('labirinto_shields');
+      localStorage.removeItem('labirinto_ammo');
+      // ✅ NON rimuovere labirinto_coins: il salvadanaio accumula partita dopo partita
+      localStorage.removeItem('labirinto_next_url');
+      window.location.href = 'level.html?l=1';
+    });
+
+    // Gestione Continua
+    const nextUrl = localStorage.getItem('labirinto_next_url');
+    const btnContinue = document.getElementById('btn-continue');
+    if (nextUrl) {
+      btnContinue.hidden = false;
+      btnContinue.href = nextUrl;
+    }
+
+    // ✅ SBLOCCA LIVELLI — password "GIP" (case-insensitive)
+    const unlockBtn = document.getElementById('btn-unlock-levels');
+    if (unlockBtn) {
+      unlockBtn.addEventListener('click', () => {
+        const pwd = prompt('Inserisci la password per sboccare tutti i livelli:');
+        if (pwd === null) return;
+        if (pwd.trim().toUpperCase() === 'GIP') {
+          window.location.href = 'level-picker.html';
+        } else {
+          alert('❌ Password errata.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
